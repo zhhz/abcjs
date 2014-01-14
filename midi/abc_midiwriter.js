@@ -55,6 +55,9 @@ MidiProxy.prototype.startNote = function (pitch, loudness, abcelem) {
   this.qtmidi.startNote(pitch, loudness, abcelem);
 };
 
+/**
+ * End a note of pitch after length amount of time
+ */
 MidiProxy.prototype.endNote = function (pitch, length) {
   this.javamidi.endNote(pitch, length);
   this.qtmidi.endNote(pitch, length);
@@ -71,7 +74,7 @@ MidiProxy.prototype.embed = function(parent) {
 };
 
 function JavaMidi(midiwriter) {
-  this.playlist = []; // contains {time:t,funct:f} pairs
+  this.playlist = []; // contains {time:t,funct:f} pairs, with t expressed in miditicks (480 per quarternote)
   this.trackcount = 0;
   this.timecount = 0;
   this.tempo = 60;
@@ -375,6 +378,7 @@ ABCJS.midi.MidiWriter = function(parent, options) {
   this.program = options.program || 2;
 	this.noteOnAndChannel = "%90";
   this.javamidi = options.type ==="java" || false;
+  this.timbremidi = options.type ==="timbre" || false;
   this.listeners = [];
   this.transpose = 0;	// PER
   if (this.javamidi) {
@@ -462,8 +466,8 @@ ABCJS.midi.MidiWriter.prototype.getElem = function() {
 };
 
 ABCJS.midi.MidiWriter.prototype.writeABC = function(abctune) {
-  try {
-    this.midi = (this.javamidi) ? new MidiProxy(new JavaMidi(this), new Midi()) : new Midi();
+  // TODO-GD put the try catch back in try {
+    this.midi = (this.javamidi || this.timbremidi) ? new MidiProxy((this.javamidi) ? new JavaMidi(this) : new TimbreMidi(this), new Midi()) : new Midi();
     this.baraccidentals = [];
     this.abctune = abctune;
     this.baseduration = 480*4; // nice and divisible, equals 1 whole note
@@ -515,9 +519,9 @@ ABCJS.midi.MidiWriter.prototype.writeABC = function(abctune) {
     }
     
     this.midi.embed(this.parent);
-  } catch (e) {
-    this.parent.innerHTML="Couldn't write midi: "+e;
-  }
+  //} catch (e) {
+  //  this.parent.innerHTML="Couldn't write midi: "+e;
+  //}
 };
 
 ABCJS.midi.MidiWriter.prototype.writeABCLine = function() {
