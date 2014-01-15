@@ -392,7 +392,10 @@ window.ABCJS.Editor.prototype.isDirty = function() {
 };
 
 window.ABCJS.Editor.prototype.highlight = function(abcelem) {
-  this.editarea.setSelection(abcelem.startChar, abcelem.endChar);
+  var start = abcelem.startChar || 0;
+  var end = abcelem.endChar || 0;
+  this.editarea.setSelection(start, end);
+
 };
 
 window.ABCJS.Editor.prototype.pause = function(shouldPause) {

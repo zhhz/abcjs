@@ -404,8 +404,9 @@ ABCJS.midi.MidiWriter.prototype.addListener = function(listener) {
 };
 
 ABCJS.midi.MidiWriter.prototype.notifySelect = function (abcelem) {
+  var abselem = abcelem.abselem || {};
   for (var i=0; i<this.listeners.length;i++) {
-    this.listeners[i].notifySelect(abcelem.abselem);
+    this.listeners[i].notifySelect(abselem);
   }
 };
 

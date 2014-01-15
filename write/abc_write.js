@@ -55,10 +55,13 @@ ABCJS.write.Printer = function(paper, params) {
 // notify all listeners that a graphical element has been selected
 ABCJS.write.Printer.prototype.notifySelect = function (abselem) {
   this.clearSelection();
-  this.selected = [abselem];
-  abselem.highlight();
+  if (abselem.highlight) {
+    this.selected = [abselem];
+    abselem.highlight();
+  }
+  var abcelem = abselem.abcelem || {};
   for (var i=0; i<this.listeners.length;i++) {
-    this.listeners[i].highlight(abselem.abcelem);
+    this.listeners[i].highlight(abcelem);
   }
 };
 

@@ -106,34 +106,45 @@ TimbreMidi.prototype.addRest = function (length) {
 
 TimbreMidi.prototype.embed = function(parent) {
 
-  function setAttributes(elm, attrs){
+  this.setAttributes = function(elm, attrs){
     for(var attr in attrs)
       if (attrs.hasOwnProperty(attr))
 	elm.setAttribute(attr, attrs[attr]);
     return elm;
   }
+
+  this.playstyle = "margin-left:5px; display:inline-block; width: 0; height: 0; border-top: 5px solid transparent; border-left: 10px solid black; border-bottom: 5px solid transparent; ";
+  this.pausestyle = "margin-left:5px; display:inline-block; width: 2px; height: 10px; border-left: 4px solid black; border-top: 0px; border-bottom: 0px; border-right:4px solid black;"
+  this.stopstyle = "margin-left:5px; display:inline-block; width:10px; height:10px; background:black";
   
-  this.playlink = setAttributes(document.createElement('a'), {
-    style: "border:1px solid black; margin:3px;"
+  this.playlink = this.setAttributes(document.createElement('div'), {
+    style: this.playstyle
     });  
-  this.playlink.innerHTML = "play";
+
+
+  //this.playlink.innerHTML = "play";
   var self = this;
   this.playlink.onmousedown = function() {
     if (self.playing) {
-      this.innerHTML = "play";
+      this.innerHTML = "";
+      self.setAttributes(this, {
+    style: self.playstyle
+      });
       self.pausePlay();
     } else {
-      this.innerHTML = "pause";
+      self.setAttributes(this, {
+	style: self.pausestyle
+      });
       self.startPlay();
     }
   };
   parent.appendChild(this.playlink);
 
-  var stoplink = setAttributes(document.createElement('a'), {
-    style: "border:1px solid black; margin:3px;"
+  var stoplink = this.setAttributes(document.createElement('div'), {
+    style: this.stopstyle
     });  
-  stoplink.innerHTML = "stop";
-  //var self = this;
+  //stoplink.innerHTML = "stop";
+
   stoplink.onmousedown = function() {
     self.stopPlay(); 
   };
@@ -157,8 +168,11 @@ TimbreMidi.prototype.initPlay = function() {
 
 TimbreMidi.prototype.stopPlay = function() {
   this.pausePlay();
-  this.playlink.innerHTML = "play";
-  this.midiwriter
+  this.playlink.innerHTML = "";
+  this.setAttributes(this.playlink, {
+    style: this.playstyle
+  });
+  this.midiwriter.notifySelect({});
   this.initPlay();
 };
 
