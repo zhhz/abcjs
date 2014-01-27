@@ -532,7 +532,7 @@ ABCJS.midi.MidiWriter.prototype.writeABCLine = function() {
   this.writeABCVoiceLine();
 };
 
-ABCJS.midi.MidiWriter.prototype.writeABCVoiceLine = function () {
+  ABCJS.midi.MidiWriter.prototype.writeABCVoiceLine = function () {
   this.pos=0;
   while (this.pos<this.getVoice().length) {
     this.writeABCElement(this.getElem());
@@ -545,6 +545,19 @@ ABCJS.midi.MidiWriter.prototype.writeABCVoiceLine = function () {
     }
   }
 };
+
+  ABCJS.midi.MidiWriter.prototype.getNextPitches = function () {
+    //TODO-GD this won't interact well with marks and the like
+    var i = this.pos;
+    while (i<this.getVoice().length) {
+      i++;
+      var elem = this.getVoice()[i];
+      if (elem.el_type === "note" && elem.pitches) {
+	return elem.pitches;
+      }
+    }
+    return null;
+  }
 
 ABCJS.midi.MidiWriter.prototype.writeABCElement = function(elem) {
   var foo;
@@ -612,20 +625,37 @@ ABCJS.midi.MidiWriter.prototype.writeNote = function(elem) {
 
       if (note.startTie) {
 	this.tieduration=mididuration;
-      } 
+	// commented out code fixes the case such as (A | A) where slurs are used instead of ties, but is still buggy
+	//} else if (note.startSlur) {
+	//this.sameslurduration=0;
+	//var nextpitches = this.getNextPitches();
+	//if (nextpitches) {
+	//for (var j=0; j<nextpitches.length; j++) {
+	// if (nextpitches[j].pitch === pitch) { //TODO-GD cross bar accidental to non accidental or vice versa will f up.
+	//  this.sameslurduration=mididuration;
+	//}
+	//}
+	//}
+      }
+      // TODO-GD what happens when ties or slurs exist in chords?
+
     }
 
     for (i=0; i<elem.pitches.length; i++) {
       var note = elem.pitches[i];
       var pitch= note.pitch+this.transpose;	// PER
       if (note.startTie) continue; // don't terminate it
+      //if (note.startSlur && this.sameslurduration>0) continue; // also don't terminate it
       if (note.endTie) {
 	this.midi.endNote(midipitches[i],mididuration+this.tieduration);
+      //} else if (note.endSlur) {
+	//this.midi.endNote(midipitches[i],mididuration+this.slurduration);
       } else {
 	this.midi.endNote(midipitches[i],mididuration);
       }
       mididuration = 0; // put these to zero as we've moved forward in the midi
       this.tieduration=0;
+      //this.sameslurduration=0;
     }
   } else if (elem.rest && elem.rest.type !== 'spacer') {
     this.midi.addRest(mididuration);
