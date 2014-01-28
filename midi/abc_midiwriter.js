@@ -25,33 +25,33 @@ function setAttributes(elm, attrs){
 //};
 
 
-function MidiProxy(javamidi,qtmidi) {
-  this.javamidi = javamidi;
+function MidiProxy(realtimemidi,qtmidi) {
+  this.realtimemidi = realtimemidi;
   this.qtmidi = qtmidi;
 }
 
 MidiProxy.prototype.setTempo = function (qpm) {
-  this.javamidi.setTempo(qpm);
+  this.realtimemidi.setTempo(qpm);
   this.qtmidi.setTempo(qpm);
 };
 
 MidiProxy.prototype.startTrack = function () {
-  this.javamidi.startTrack();
+  this.realtimemidi.startTrack();
   this.qtmidi.startTrack();
 };
 
 MidiProxy.prototype.endTrack = function () {
-  this.javamidi.endTrack();
+  this.realtimemidi.endTrack();
   this.qtmidi.endTrack();
 };
 
 MidiProxy.prototype.setInstrument = function (number) {
-  this.javamidi.setInstrument(number);
+  this.realtimemidi.setInstrument(number);
   this.qtmidi.setInstrument(number);
 };
 
 MidiProxy.prototype.startNote = function (pitch, loudness, abcelem) {
-  this.javamidi.startNote(pitch, loudness, abcelem);
+  this.realtimemidi.startNote(pitch, loudness, abcelem);
   this.qtmidi.startNote(pitch, loudness, abcelem);
 };
 
@@ -59,17 +59,17 @@ MidiProxy.prototype.startNote = function (pitch, loudness, abcelem) {
  * End a note of pitch after length amount of time
  */
 MidiProxy.prototype.endNote = function (pitch, length) {
-  this.javamidi.endNote(pitch, length);
+  this.realtimemidi.endNote(pitch, length);
   this.qtmidi.endNote(pitch, length);
 };
 
 MidiProxy.prototype.addRest = function (length) {
-  this.javamidi.addRest(length);
+  this.realtimemidi.addRest(length);
   this.qtmidi.addRest(length);
 };
 
 MidiProxy.prototype.embed = function(parent) {
-  this.javamidi.embed(parent);
+  this.realtimemidi.embed(parent);
   this.qtmidi.embed(parent,true);
 };
 
@@ -546,14 +546,14 @@ ABCJS.midi.MidiWriter.prototype.writeABCLine = function() {
   }
 };
 
-  ABCJS.midi.MidiWriter.prototype.getNextPitches = function () {
+  ABCJS.midi.MidiWriter.prototype.getNextElemWithPitches = function () {
     //TODO-GD this won't interact well with marks and the like
     var i = this.pos;
     while (i<this.getVoice().length) {
       i++;
       var elem = this.getVoice()[i];
       if (elem.el_type === "note" && elem.pitches) {
-	return elem.pitches;
+	return elem;
       }
     }
     return null;
@@ -625,10 +625,10 @@ ABCJS.midi.MidiWriter.prototype.writeNote = function(elem) {
 
       if (note.startTie) {
 	this.tieduration=mididuration;
-	// commented out code fixes the case such as (A | A) where slurs are used instead of ties, but is still buggy
+	// this code fixes the case such as (A | A) where slurs are used instead of ties, but is still buggy
 	//} else if (note.startSlur) {
 	//this.sameslurduration=0;
-	//var nextpitches = this.getNextPitches();
+	//var nextpitches = this.getNextElem();
 	//if (nextpitches) {
 	//for (var j=0; j<nextpitches.length; j++) {
 	// if (nextpitches[j].pitch === pitch) { //TODO-GD cross bar accidental to non accidental or vice versa will f up.

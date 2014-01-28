@@ -1,4 +1,4 @@
-//    abc_timbre_midi.js: Implements the ABCJS midiproxy API via timbre.js
+//    abc_timbre_midi.js: Implements the ABCJS midiproxy API via timbre.js or MIDI.js
 //    Copyright (C) 2014 Gregory Dyke (gregdyke at gmail dot com)
 //
 //    This program is free software: you can redistribute it and/or modify
@@ -19,15 +19,95 @@
  *
  *
  */
+
+
 function TimbreMidi(midiwriter) {
   // note that this is generally based of of JavaMidi // which is getting deprecated
   this.playlist = []; // contains {time:t,funct:f} pairs, with t expressed in miditicks (480 per quarternote)
   this.trackcount = 0;
   this.timecount = 0;
   this.tempo = 60;
-  this.synth = T("OscGen", {wave:"pulse", env:{type:"adsr", r:150}, mul:0.25}).play();
+  this.channel = 1;
+  this.instrument = 1; // numbers range 1..128
+  this.instruments = [1,25, 111];
+  this.instrument_names = ["acoustic_grand_piano", "acoustic_guitar_nylon", "fiddle"]
+
+  // temporary while midi loads. this.synth must respond to noteOn and noteOff commands, so can be an Timbre instance or MIDI.js
+  this.setTimbreAsSynth();
+
+
   this.midiwriter = midiwriter;
+  var self = this;
+
+  MIDI.technology && self.setMIDIJSAsSynth();
+
+  MIDI && MIDI.loadPlugin && (!MIDI.technology) && MIDI.loadPlugin({
+    soundfontUrl: "midi/FluidR3_GM/",
+    instruments: this.instrument_names, // or multiple instruments
+    callback: function() { 
+      console.log("MIDI.js loaded");
+      // don't change midi playback on the fly because otherwise it's weird on iOS (user-events need to generate audio playback)
+    }
+  });
+  
 }
+
+TimbreMidi.prototype.setTimbreAsSynth = function () {
+  this.synth && this.synth.allNoteOff();
+  var TSynth = T("OscGen", {wave:"pulse", env:{type:"adsr", r:150}, mul:0.25}).play();
+  this.synth = {
+    noteOn: function(pitch, velocity) {
+      TSynth.noteOn(pitch, velocity);
+    },
+    noteOff: function(pitch) {
+      TSynth.noteOff(pitch);
+    },
+    allNoteOff: function() {
+      TSynth.allNoteOff();
+    },
+    setProgram: function(channel, instrument) {
+      
+    },
+    type: "timbre"
+  };
+  this.setInstrument(this.instrument);
+};
+
+TimbreMidi.prototype.setMIDIJSAsSynth = function () {
+  this.synth && this.synth.allNoteOff();
+  var onnotes = {};
+  var self = this;
+  this.synth = {
+    noteOn: function(pitch, velocity) {
+      MIDI.noteOn(self.channel, pitch, velocity, 0);
+      onnotes[pitch] = true;
+    },
+    noteOff: function(pitch) {
+      try {
+	MIDI.noteOff(self.channel, pitch, 0);
+      } catch (e) {
+	// was already off
+      }
+      delete onnotes[pitch];
+    },
+    allNoteOff: function() {
+      for (note in onnotes) {
+	try {
+	  MIDI.noteOff(self.channel, note, 0);
+	} catch (e) {
+	  //note was already off
+	}
+      }
+      onnotes = {};
+    },
+    setProgram: function(channel, instrument) {
+      MIDI.programChange(channel, instrument-1); // 0-indexed
+      //TODO-GD this sets the program on the whole midi object - should specialise as we change between TimbreMidi instances
+    },
+    type: "MIDIJS"
+  }
+  this.setInstrument(this.instrument);
+};
 
 TimbreMidi.prototype.setTempo = function (qpm) {
   this.tempo = qpm;
@@ -39,12 +119,6 @@ TimbreMidi.prototype.startTrack = function () {
   this.timecount=0;
   this.playlistpos=0;
   this.first=true;
-  if (this.instrument) {
-    this.setInstrument(this.instrument);
-  }
-  if (this.channel) {
-    this.setChannel(this.channel);
-  }
 };
 
 TimbreMidi.prototype.endTrack = function () {
@@ -52,7 +126,11 @@ TimbreMidi.prototype.endTrack = function () {
 };
 
 TimbreMidi.prototype.setInstrument = function (number) {
+  if (this.instruments.indexOf(number)<0) {
+    number = this.instruments[0];
+  }
   this.instrument=number;
+  this.synth.setProgram(this.channel,this.instrument);
   //this.setInstrument(number);
   //TODO-GD push this into the playlist?
 };
@@ -113,9 +191,9 @@ TimbreMidi.prototype.embed = function(parent) {
     return elm;
   }
 
-  this.playstyle = "margin-left:5px; display:inline-block; width: 0; height: 0; border-top: 5px solid transparent; border-left: 10px solid black; border-bottom: 5px solid transparent; ";
-  this.pausestyle = "margin-left:5px; display:inline-block; width: 2px; height: 10px; border-left: 4px solid black; border-top: 0px; border-bottom: 0px; border-right:4px solid black;"
-  this.stopstyle = "margin-left:5px; display:inline-block; width:10px; height:10px; background:black";
+  this.playstyle = "margin-left:15px; display:inline-block; width: 0; height: 0; border-top: 5px solid transparent; border-left: 10px solid black; border-bottom: 5px solid transparent; ";
+  this.pausestyle = "margin-left:15px; display:inline-block; width: 2px; height: 10px; border-left: 4px solid black; border-top: 0px; border-bottom: 0px; border-right:4px solid black;"
+  this.stopstyle = "margin-left:15px; display:inline-block; width:10px; height:10px; background:black";
   
   this.playlink = this.setAttributes(document.createElement('div'), {
     style: this.playstyle
@@ -154,6 +232,7 @@ TimbreMidi.prototype.embed = function(parent) {
 };
 
 TimbreMidi.prototype.initPlay = function() {
+  // TODO set all general variables (such as MIDI to the specifics of this instance)
   this.playing = false;
   this.sched = T("schedule");
   var mspertick = (60000/this.tempo*480) // 480 * this.tempo is number of ticks per minute 
@@ -177,13 +256,25 @@ TimbreMidi.prototype.stopPlay = function() {
 };
 
 TimbreMidi.prototype.startPlay = function() {
+
+  if (this.synth.type !== "MIDIJS"  && MIDI.technology) {
+    this.setMIDIJSAsSynth();
+    this.synth.noteOn(70,1);
+    this.synth.noteOff(70);
+  } 
+
   this.playing = true;
+
+  // in iOS call this to activate sound
+
+
   this.sched.start();
 
 };
 
 TimbreMidi.prototype.pausePlay = function() {
   this.playing = false;
-  this.sched.stop();
   this.synth.allNoteOff();
+  this.sched.stop();
+  
 };
