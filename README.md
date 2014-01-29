@@ -239,6 +239,9 @@ printerParams
 midiParams
 	qpm 	180 	the tempo, if not specified in abcString
 	program 	2 	the midi program to use, if not specified in abcString
+	instruments	[1]	the array of midi instruments to be loaded (note this is 1-indexed)
+	soundfontUrl	"http://rawgithub.com/gleitz/midi-js-soundfonts/master/FluidR3_GM/"	the base url for soundfonts (hosting your own soundfonts and using "./soundfonts/" would be a good alternative)
+	type		null	set to "timbre" if timbre.js and MIDI.js should be used for midi
 renderParams
 	startingTune 	0 	the index of the tune in the tunebook to render (starting at zero for the first tune)
 ```
