@@ -14,45 +14,54 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+if (!window.ABCJS)
+	window.ABCJS = {};
+
+if (!window.ABCJS.midi)
+	window.ABCJS.midi = {};
+
+(function() {
 
 /**
  *
  *
  */
-
-
-function TimbreMidi(midiwriter) {
-  // note that this is generally based of of JavaMidi // which is getting deprecated
+ABCJS.midi.TimbreMidi = function (midiwriter, params) {
   this.playlist = []; // contains {time:t,funct:f} pairs, with t expressed in miditicks (480 per quarternote)
   this.trackcount = 0;
   this.timecount = 0;
   this.tempo = 60;
   this.channel = 1;
   this.instrument = 1; // numbers range 1..128
-  this.instruments = [1,25, 111];
-  this.instrument_names = ["acoustic_grand_piano", "acoustic_guitar_nylon", "fiddle"]
+  this.instruments = params["instruments"] || [1];
+ 
 
   // temporary while midi loads. this.synth must respond to noteOn and noteOff commands, so can be an Timbre instance or MIDI.js
   this.setTimbreAsSynth();
-
-
   this.midiwriter = midiwriter;
-  var self = this;
 
-  MIDI.technology && self.setMIDIJSAsSynth();
-
-  MIDI && MIDI.loadPlugin && (!MIDI.technology) && MIDI.loadPlugin({
-    soundfontUrl: "midi/FluidR3_GM/",
-    instruments: this.instrument_names, // or multiple instruments
-    callback: function() { 
-      console.log("MIDI.js loaded");
-      // don't change midi playback on the fly because otherwise it's weird on iOS (user-events need to generate audio playback)
+  if (MIDI) { // MIDI.technology truthy -> midi.loadPlugin has been successfully called
+    var soundfontUrl = params["soundfontUrl"] || "http://rawgithub.com/gleitz/midi-js-soundfonts/master/FluidR3_GM/";
+    var instrument_names = [];
+    for (var iidx=0; iidx<this.instruments.length; iidx++) {
+      var GMinstrument = this.instruments[iidx]-1;
+      instrument_names.push(MIDI.GeneralMIDI.byId[GMinstrument].id); // why .id accesses the instrument name in a hash that hashes by number id, I don't know
     }
-  });
+    
+    MIDI.technology && this.setMIDIJSAsSynth();
+    MIDI.loadPlugin && (!MIDI.technology) && MIDI.loadPlugin({
+      soundfontUrl: soundfontUrl,
+      instruments: instrument_names, // or multiple instruments
+      callback: function() { 
+	console.log("MIDI.js loaded");
+	// don't change midi playback on the fly because otherwise it's weird on iOS (user-events need to generate audio playback)
+      }
+    });
+  }
   
 }
 
-TimbreMidi.prototype.setTimbreAsSynth = function () {
+ABCJS.midi.TimbreMidi.prototype.setTimbreAsSynth = function () {
   this.synth && this.synth.allNoteOff();
   var TSynth = T("OscGen", {wave:"pulse", env:{type:"adsr", r:150}, mul:0.25}).play();
   this.synth = {
@@ -73,7 +82,7 @@ TimbreMidi.prototype.setTimbreAsSynth = function () {
   this.setInstrument(this.instrument);
 };
 
-TimbreMidi.prototype.setMIDIJSAsSynth = function () {
+ABCJS.midi.TimbreMidi.prototype.setMIDIJSAsSynth = function () {
   this.synth && this.synth.allNoteOff();
   var onnotes = {};
   var self = this;
@@ -109,11 +118,11 @@ TimbreMidi.prototype.setMIDIJSAsSynth = function () {
   this.setInstrument(this.instrument);
 };
 
-TimbreMidi.prototype.setTempo = function (qpm) {
+ABCJS.midi.TimbreMidi.prototype.setTempo = function (qpm) {
   this.tempo = qpm;
 };
 
-TimbreMidi.prototype.startTrack = function () {
+ABCJS.midi.TimbreMidi.prototype.startTrack = function () {
   this.silencelength = 0;
   this.trackcount++;
   this.timecount=0;
@@ -121,11 +130,11 @@ TimbreMidi.prototype.startTrack = function () {
   this.first=true;
 };
 
-TimbreMidi.prototype.endTrack = function () {
+ABCJS.midi.TimbreMidi.prototype.endTrack = function () {
   // need to do anything?
 };
 
-TimbreMidi.prototype.setInstrument = function (number) {
+ABCJS.midi.TimbreMidi.prototype.setInstrument = function (number) {
   if (this.instruments.indexOf(number)<0) {
     number = this.instruments[0];
   }
@@ -135,20 +144,20 @@ TimbreMidi.prototype.setInstrument = function (number) {
   //TODO-GD push this into the playlist?
 };
 
-TimbreMidi.prototype.setChannel = function (number) {
+ABCJS.midi.TimbreMidi.prototype.setChannel = function (number) {
   this.channel=number;
   //this.midiapi.setChannel(number);
   //TODO-GD
 };
 
-TimbreMidi.prototype.updatePos = function() {
+ABCJS.midi.TimbreMidi.prototype.updatePos = function() {
   while(this.playlist[this.playlistpos] && 
 	this.playlist[this.playlistpos].time<this.timecount) {
     this.playlistpos++;
   }
 };
 
-TimbreMidi.prototype.startNote = function (pitch, loudness, abcelem) {
+ABCJS.midi.TimbreMidi.prototype.startNote = function (pitch, loudness, abcelem) {
   this.timecount+=this.silencelength;
   this.silencelength = 0;
   if (this.first) {
@@ -166,7 +175,7 @@ TimbreMidi.prototype.startNote = function (pitch, loudness, abcelem) {
   });
 };
 
-TimbreMidi.prototype.endNote = function (pitch, length) {
+ABCJS.midi.TimbreMidi.prototype.endNote = function (pitch, length) {
   this.timecount+=length;
   this.updatePos();
   var self=this;
@@ -178,11 +187,11 @@ TimbreMidi.prototype.endNote = function (pitch, length) {
     });
 };
 
-TimbreMidi.prototype.addRest = function (length) {
+ABCJS.midi.TimbreMidi.prototype.addRest = function (length) {
   this.silencelength += length;
 };
 
-TimbreMidi.prototype.embed = function(parent) {
+ABCJS.midi.TimbreMidi.prototype.embed = function(parent) {
 
   this.setAttributes = function(elm, attrs){
     for(var attr in attrs)
@@ -231,7 +240,7 @@ TimbreMidi.prototype.embed = function(parent) {
   this.initPlay();
 };
 
-TimbreMidi.prototype.initPlay = function() {
+ABCJS.midi.TimbreMidi.prototype.initPlay = function() {
   // TODO set all general variables (such as MIDI to the specifics of this instance)
   this.playing = false;
   this.sched = T("schedule");
@@ -245,7 +254,7 @@ TimbreMidi.prototype.initPlay = function() {
   });
 };
 
-TimbreMidi.prototype.stopPlay = function() {
+ABCJS.midi.TimbreMidi.prototype.stopPlay = function() {
   this.pausePlay();
   this.playlink.innerHTML = "";
   this.setAttributes(this.playlink, {
@@ -255,26 +264,28 @@ TimbreMidi.prototype.stopPlay = function() {
   this.initPlay();
 };
 
-TimbreMidi.prototype.startPlay = function() {
+ABCJS.midi.TimbreMidi.prototype.startPlay = function() {
 
   if (this.synth.type !== "MIDIJS"  && MIDI.technology) {
     this.setMIDIJSAsSynth();
+    // in iOS call this to activate sound
     this.synth.noteOn(70,1);
     this.synth.noteOff(70);
   } 
 
   this.playing = true;
 
-  // in iOS call this to activate sound
+ 
 
 
   this.sched.start();
 
 };
 
-TimbreMidi.prototype.pausePlay = function() {
+ABCJS.midi.TimbreMidi.prototype.pausePlay = function() {
   this.playing = false;
   this.synth.allNoteOff();
   this.sched.stop();
   
 };
+})();
