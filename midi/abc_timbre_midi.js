@@ -269,8 +269,10 @@ ABCJS.midi.TimbreMidi.prototype.startPlay = function() {
   if (this.synth.type !== "MIDIJS"  && MIDI.technology) {
     this.setMIDIJSAsSynth();
     // in iOS call this to activate sound
-    this.synth.noteOn(70,1);
-    this.synth.noteOff(70);
+    if (/(iPad|iPhone|iPod)/g.test( navigator.userAgent)) {
+      this.synth.noteOn(4,1);
+      this.synth.noteOff(4);
+    }
   } 
 
   this.playing = true;
