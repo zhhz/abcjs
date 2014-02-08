@@ -232,10 +232,11 @@ if (!window.ABCJS.midi)
     this.program = options.program || 2;
     this.midijsparams = {
       instruments: options.instruments,
-      soundfontUrl: options.soundfontUrl
+      soundfontUrl: options.soundfontUrl,
+      usemidisoundfont: (options.type === "midijs")
     };
     this.noteOnAndChannel = "%90";
-    this.timbremidi = options.type ==="timbre" || false;
+    this.timbremidi = (options.type ==="timbre") || (options.type ==="midijs") || false;
     this.listeners = [];
     this.transpose = 0;	// PER
   };

@@ -40,7 +40,7 @@ ABCJS.midi.TimbreMidi = function (midiwriter, params) {
   this.setTimbreAsSynth();
   this.midiwriter = midiwriter;
 
-  if (MIDI) { // MIDI.technology truthy -> midi.loadPlugin has been successfully called
+  if (MIDI && params["usemidijs"]) { // MIDI.technology truthy -> midi.loadPlugin has been successfully called
     var soundfontUrl = params["soundfontUrl"] || "http://rawgithub.com/gleitz/midi-js-soundfonts/master/FluidR3_GM/";
     var instrument_names = [];
     for (var iidx=0; iidx<this.instruments.length; iidx++) {
