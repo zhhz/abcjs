@@ -1,3 +1,4 @@
 .idea/*
 tmp/*
-midi/FluidR3_GM_ignored/* 
+midi/FluidR3_GM_ignored 
+midi/FluidR3_GM_ignored/*
