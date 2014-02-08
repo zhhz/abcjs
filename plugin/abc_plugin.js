@@ -26,10 +26,14 @@ window.ABCJS.Plugin = function() {
 		is_user_script = abcjs_is_user_script;
 	} catch (ex) {
 	}
-  this.show_midi = !is_user_script || this.$.browser.mozilla;	// midi currently only works in Firefox, so in the userscript, don't complicate it.
+  this.show_midi = !is_user_script || this.$.browser.mozilla;	// midi currently only works in Firefox, so in the userscript, don't complicate it. 
   this.hide_abc = false;
   this.render_before = false;
   this.midi_options = {};
+  if (typeof T === "function") { // using timbre
+    this.show_midi = true;
+    this.midi_options.type = "timbre"
+  }
   //this.parse_options = {};
   this.render_options = {};
   this.render_classname = "abcrendered";
@@ -160,7 +164,7 @@ window.ABCJS.Plugin.prototype.render = function (contextnode, abcstring) {
 	    this.$(contextnode).after(abcdiv);
 	  }
 	}
-	if (ABCJS.MidiWriter && self.show_midi) {
+	if (ABCJS.midi.MidiWriter && self.show_midi) {
 	  var midiwriter = new ABCJS.midi.MidiWriter(abcdiv.get(0),self.midi_options);
 	  midiwriter.writeABC(tune);
 	}
@@ -198,4 +202,4 @@ $(document).ready(function() {
 	}
 	if (autostart)
 		jQuery(document).ready(ABCJS.plugin.start(jQuery));
-})();
+});
