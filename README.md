@@ -21,20 +21,23 @@ For a demo of what this can do, see the following:
 The abcjs libraries come in three basic flavors:
 ---
 
-    abcjs basic: Call the library from javascript, passing the abc string to it.
-    abcjs editor: transforms a textarea into an abc editor with score sheet and audio.
+    
+    basic abcjs: call the library from javascript, passing the abc string to it, or transform a textarea into an abc editor with score sheet and audio.
     abcjs plugin: adds onto a webpage, rendering all abc it finds. 
+    greasemonkey user script: adds onto your browser, rendering all the abc it finds as you visit other webpages.
+
+We are currently beta testing new midi support which should work across most browsers. In this case, you can use the *betamidi* versions.
 
 Which flavor should you use?
 ---
 
-If you are writing significant JavaScript on your site, and you are generating the music yourself, then you probably want to use `abcjs-basic`. This gives you the most control over the generation.
+If you are writing significant javascript on your site, and you are generating the music yourself, then you probably want to use `basic abcjs`, with the api entry points described below. This gives you the most control over the generation.
 
-If you are allowing the user to enter music using ABC notation, whether a whole tune or a fragment, then you probably want to use `abcjs-editor`. This is just like the basic version, except that it adds the ability for the music generator to watch a textarea and output what the user puts there.
+If you are allowing the user to enter music using ABC notation, whether a whole tune or a fragment, then you probably want to use `basic abcjs`, with the `ABCJS.Editor` entry point described below.
 
 If you are using Rails, you can just use this gem: https://github.com/paulrosen/abcjs-rails This is the same code, but it has been packaged for you to use with the asset pipeline.
 
-If you already have ABC notation on your page and don't want to modify the page more than you have to, then you can use `abcjs-plugin`, which will render all ABC that it finds on the page on page load, simply by including one line: the line to include the script.
+If you already have ABC notation on your page and don't want to modify the page more than you have to, then you can use `abcjs plugin`, which will render all ABC that it finds on the page on page load, simply by including one line: the line to include the script.
 
 If you are looking at someone else's website and see ABC on the page and want to see what it looks like in standard notation, you can install the greasemonkey script in FireFox or Chrome and it will render the ABC for you.
 
@@ -43,30 +46,34 @@ Downloads:
 Here are the latest versions. You can just download these:
 
 Basic:
-https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_basic_1.10-min.js
-
-Editor:
-https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_editor_1.10-min.js
+https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_2.0-min.js
 
 Plugin:
-https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_plugin_1.10-min.js
+https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_plugin_2.0-min.js
 
 Greasemonkey script:
-https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_plugin_1.10.user.js
+https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_plugin_2.0.user.js
 
 And here are versions packaged without the standard libraries. To use these, you need to include those libraries yourself:
 
 Basic without Raphael:
-https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_basic_noraphael_1.10-min.js
-
-Editor without Raphael:
-https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_editor_noraphael_1.10-min.js
+https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_basic_noraphael_2.0-min.js
 
 Plugin without JQuery:
-https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_plugin-nojquery_1.10-min.js
+https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_plugin-nojquery_2.0-min.js
 
 Plugin without JQuery or Raphael:
-https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_plugin_noraphael_nojquery_1.10-min.js
+https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_plugin_noraphael_nojquery_2.0-min.js
+
+And here are the beta versions with midi
+Basic:
+https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_midibeta_2.0-min.js
+
+Plugin:
+https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_plugin_midibeta_2.0-min.js
+
+Plugin without JQuery:
+https://raw.github.com/paulrosen/abcjs/master/bin/abcjs_plugin_midibeta_nojquery_2.0-min.js
 
 Partial list of some websites using abcjs:
 ---
@@ -90,6 +97,12 @@ Some notes:
     Midi playback is at a very early stage and does not yet feature ornamentation, dynamics, chords or multi voice.
     Midi playback will not work in Internet Explorer 
     
+API Changes for Version 2.0
+===
+The abcjs basic and abcjs editor versions have been merged (the filesize difference is very small). The same API is valid on the new version.
+
+In the beta versions, two new `midi_options` are available, `type:"timbre"` and `type:"midijs"` 
+
 API Changes for Version 1.3
 ===
 
