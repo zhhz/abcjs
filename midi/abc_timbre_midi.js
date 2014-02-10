@@ -191,20 +191,22 @@ ABCJS.midi.TimbreMidi.prototype.addRest = function (length) {
   this.silencelength += length;
 };
 
-ABCJS.midi.TimbreMidi.prototype.embed = function(parent) {
-
-  this.setAttributes = function(elm, attrs){
+var setAttributes = function(elm, attrs){
     for(var attr in attrs)
       if (attrs.hasOwnProperty(attr))
 	elm.setAttribute(attr, attrs[attr]);
     return elm;
   }
 
+ABCJS.midi.TimbreMidi.prototype.embed = function(parent) {
+
+  
+
   this.playstyle = "margin-left:15px; display:inline-block; width: 0; height: 0; border-top: 5px solid transparent; border-left: 10px solid black; border-bottom: 5px solid transparent; ";
   this.pausestyle = "margin-left:15px; display:inline-block; width: 2px; height: 10px; border-left: 4px solid black; border-top: 0px; border-bottom: 0px; border-right:4px solid black;"
-  this.stopstyle = "margin-left:15px; display:inline-block; width:10px; height:10px; background:black";
+  this.stopstyle = "margin-left:15px; margin-right:15px; display:inline-block; width:10px; height:10px; background:black";
   
-  this.playlink = this.setAttributes(document.createElement('div'), {
+  this.playlink = setAttributes(document.createElement('div'), {
     style: this.playstyle
     });  
 
@@ -214,20 +216,20 @@ ABCJS.midi.TimbreMidi.prototype.embed = function(parent) {
   this.playlink.onmousedown = function() {
     if (self.playing) {
       this.innerHTML = "";
-      self.setAttributes(this, {
+      setAttributes(this, {
     style: self.playstyle
       });
       self.pausePlay();
     } else {
-      self.setAttributes(this, {
+      setAttributes(this, {
 	style: self.pausestyle
       });
       self.startPlay();
     }
   };
-  parent.appendChild(this.playlink);
+  
 
-  var stoplink = this.setAttributes(document.createElement('div'), {
+  var stoplink = setAttributes(document.createElement('div'), {
     style: this.stopstyle
     });  
   //stoplink.innerHTML = "stop";
@@ -235,7 +237,8 @@ ABCJS.midi.TimbreMidi.prototype.embed = function(parent) {
   stoplink.onmousedown = function() {
     self.stopPlay(); 
   };
-  parent.appendChild(stoplink);
+  parent.insertBefore(stoplink,parent.firstChild);
+  parent.insertBefore(this.playlink,stoplink);
 
   this.initPlay();
 };
@@ -249,15 +252,16 @@ ABCJS.midi.TimbreMidi.prototype.initPlay = function() {
     this.sched.schedAbs(this.playlist[i].time, this.playlist[i].funct);
   } 
   var self = this;
-  this.sched.schedAbs(this.playlist[this.playlist.length-1].time, function() {
-    self.stopPlay(); // when reach end
+  var stopplayat = (this.playlist.length>0) ? this.playlist[this.playlist.length-1].time : 100;
+  this.sched.schedAbs(stopplayat, function() {
+      self.stopPlay(); // when reach end, or almost immediately
   });
 };
 
 ABCJS.midi.TimbreMidi.prototype.stopPlay = function() {
   this.pausePlay();
   this.playlink.innerHTML = "";
-  this.setAttributes(this.playlink, {
+  setAttributes(this.playlink, {
     style: this.playstyle
   });
   this.midiwriter.notifySelect({});

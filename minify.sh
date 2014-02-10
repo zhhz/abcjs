@@ -26,7 +26,7 @@ java -jar yuicompressor-2.4.2.jar  --line-break 7000 -o bin/abcjs_plugin_nojquer
 echo "Compressing beta versions with midi..."
 java -jar yuicompressor-2.4.2.jar  --line-break 7000 -o bin/abcjs_midibeta_$1-min.js tmp/abcjs_all_midibeta.js
 java -jar yuicompressor-2.4.2.jar  --line-break 7000 -o bin/abcjs_plugin_midibeta_nojquery_$1-min.js tmp/abcjs_plugin_midibeta.js
-cat jquery-1.10.2.min.js bin/abcjs_plugin_nojquery_$1-min.js > bin/abcjs_plugin_$1-min.js
-cat jquery-1.10.2.min.js bin/abcjs_plugin_midibeta_nojquery_$1-min.js > bin/abcjs_plugin_midibeta_$1-min.js
+cat lib/zepto.min.js bin/abcjs_plugin_nojquery_$1-min.js > bin/abcjs_plugin_$1-min.js
+cat lib/zepto.min.js bin/abcjs_plugin_midibeta_nojquery_$1-min.js > bin/abcjs_plugin_midibeta_$1-min.js
 cat plugin/greasemonkey.js bin/abcjs_plugin_$1-min.js > bin/abcjs_plugin_$1.user.js
 
