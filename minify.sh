@@ -11,9 +11,9 @@ cat parse/abc_common.js parse/abc_parse.js parse/abc_parse_directive.js parse/ab
 cat write/abc_glyphs.js write/abc_graphelements.js write/abc_layout.js write/abc_write.js write/sprintf.js > tmp/write.js
 cat midi/MIDI.js midi/inc/Base64.js midi/inc/base64binary.js midi/timbre.js > tmp/MIDIlibs.js
 cat midi/abc_midiwriter.js midi/abc_timbre_midi.js > tmp/midi.js
-cat api/abc_tunebook.js data/abc_tune.js edit/abc_editor.js tmp/midi.js tmp/parse.js tmp/write.js > tmp/abcjs-noraphael.js
+cat lib/polyfills.js api/abc_tunebook.js data/abc_tune.js edit/abc_editor.js tmp/midi.js tmp/parse.js tmp/write.js > tmp/abcjs-noraphael.js
 cat write/raphael.js tmp/abcjs-noraphael.js > tmp/abcjs_all.js
-cat tmp/abcjs-noraphael.js plugin/abc_plugin.js > tmp/abcjs_plugin-noraphael.js
+cat lib/documentready.js tmp/abcjs-noraphael.js plugin/abc_plugin.js > tmp/abcjs_plugin-noraphael.js
 cat tmp/abcjs_all.js plugin/abc_plugin.js > tmp/abcjs_plugin.js
 cat tmp/MIDIlibs.js tmp/abcjs_all.js > tmp/abcjs_all_midibeta.js
 cat tmp/MIDIlibs.js tmp/abcjs_plugin.js > tmp/abcjs_plugin_midibeta.js 
