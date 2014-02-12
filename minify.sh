@@ -14,19 +14,17 @@ cat midi/abc_midiwriter.js midi/abc_timbre_midi.js > tmp/midi.js
 cat lib/polyfills.js api/abc_tunebook.js data/abc_tune.js edit/abc_editor.js tmp/midi.js tmp/parse.js tmp/write.js > tmp/abcjs-noraphael.js
 cat write/raphael.js tmp/abcjs-noraphael.js > tmp/abcjs_all.js
 cat lib/documentready.js tmp/abcjs-noraphael.js plugin/abc_plugin.js > tmp/abcjs_plugin-noraphael.js
-cat tmp/abcjs_all.js plugin/abc_plugin.js > tmp/abcjs_plugin.js
+cat lib/documentready.js tmp/abcjs_all.js plugin/abc_plugin.js > tmp/abcjs_plugin.js
 cat tmp/MIDIlibs.js tmp/abcjs_all.js > tmp/abcjs_all_midibeta.js
 cat tmp/MIDIlibs.js tmp/abcjs_plugin.js > tmp/abcjs_plugin_midibeta.js 
 echo "Compressing basic and editor..."
 java -jar yuicompressor-2.4.2.jar  --line-break 7000 -o bin/abcjs_$1-min.js tmp/abcjs_all.js
 java -jar yuicompressor-2.4.2.jar  --line-break 7000 -o bin/abcjs_noraphael_$1-min.js tmp/abcjs-noraphael.js
 echo "Compressing plugin..."
-java -jar yuicompressor-2.4.2.jar  --line-break 7000 -o bin/abcjs_plugin_noraphael_nojquery_$1-min.js tmp/abcjs_plugin-noraphael.js
-java -jar yuicompressor-2.4.2.jar  --line-break 7000 -o bin/abcjs_plugin_nojquery_$1-min.js tmp/abcjs_plugin.js
+java -jar yuicompressor-2.4.2.jar  --line-break 7000 -o bin/abcjs_plugin_noraphael_$1-min.js tmp/abcjs_plugin-noraphael.js
+java -jar yuicompressor-2.4.2.jar  --line-break 7000 -o bin/abcjs_plugin_$1-min.js tmp/abcjs_plugin.js
 echo "Compressing beta versions with midi..."
 java -jar yuicompressor-2.4.2.jar  --line-break 7000 -o bin/abcjs_midibeta_$1-min.js tmp/abcjs_all_midibeta.js
-java -jar yuicompressor-2.4.2.jar  --line-break 7000 -o bin/abcjs_plugin_midibeta_nojquery_$1-min.js tmp/abcjs_plugin_midibeta.js
-cat lib/zepto_no_$.min.js bin/abcjs_plugin_nojquery_$1-min.js > bin/abcjs_plugin_$1-min.js
-cat lib/zepto_no_$.min.js bin/abcjs_plugin_midibeta_nojquery_$1-min.js > bin/abcjs_plugin_midibeta_$1-min.js
+java -jar yuicompressor-2.4.2.jar  --line-break 7000 -o bin/abcjs_plugin_midibeta_$1-min.js tmp/abcjs_plugin_midibeta.js
 cat plugin/greasemonkey.js bin/abcjs_plugin_$1-min.js > bin/abcjs_plugin_$1.user.js
 

@@ -15,7 +15,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-//    requires: abcjs, raphael, jquery, documentready.js (creates $$$ function)
+//    requires: abcjs, raphael, jquery, documentready.js (creates window.$$$ function)
 
 if (!window.ABCJS)
 	window.ABCJS = {};
@@ -24,8 +24,13 @@ if (!window.ABCJS)
 
   function setAttributes(elm, attrs){
     for(var attr in attrs)
-      if (attrs.hasOwnProperty(attr))
-	elm.setAttribute(attr, attrs[attr]);
+      if (attrs.hasOwnProperty(attr)) {
+	if (attr==="className") {
+	  elm.className = attrs[attr];
+	} else {
+	  elm.setAttribute(attr, attrs[attr]);
+	}
+      }
     return elm;
   }
 
@@ -144,7 +149,7 @@ if (!window.ABCJS)
 	    inabc=true;
 	    abctext="";
 	    nodestobemoved=[];
-	    abcdiv = setAttributes(createElem("div",""),{class: this.text_classname});
+	    abcdiv = setAttributes(createElem("div",""),{className: this.text_classname});
 	    before(abcdiv, node);
 	    if (this.hide_abc) {
 	      hide(abc_div);
@@ -197,7 +202,7 @@ if (!window.ABCJS)
   };
   
   window.ABCJS.Plugin.prototype.render = function (contextnode, abcstring) {
-    var abcdiv = setAttributes(createElem("div",""),{class: this.render_classname});
+    var abcdiv = setAttributes(createElem("div",""),{className: this.render_classname});
     var insert = this.render_before ? before : after;
     insert(abcdiv,contextnode);
     
@@ -216,7 +221,7 @@ if (!window.ABCJS)
 	} catch (ex) { // f*** internet explorer doesn't like innerHTML in weird situations
 	  // can't remember why we don't do this in the general case, but there was a good reason
 	  remove(abcdiv);
-	  abcdiv = setAttributes(createElem("div",""),{class: self.render_classname});
+	  abcdiv = setAttributes(createElem("div",""),{className: self.render_classname});
 	  paper = Raphael(abcdiv, 800, 400);
 	  printer = new ABCJS.write.Printer(paper);
 	  printer.printABC(tune);
@@ -231,7 +236,7 @@ if (!window.ABCJS)
       if (this.clicktorender) {
 	var showspan = setAttributes(createElem("a",
 						this.show_text+(tune.metaText.title||"untitled")),
-				     {class:"abcshow", href:"#"});
+				     {className:"abcshow", href:"#"});
 	showspan.onclick = function(){
 	  doPrint();
 	  hide(showspan);
