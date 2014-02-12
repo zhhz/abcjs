@@ -5,7 +5,10 @@
 	<title>abcjs: Plugin Demo</title>
 
 	<script src="lib/zepto.js" type="text/javascript"></script>
-	<script src="proto_noconflict.js" type="text/javascript"></script>
+        <script src="lib/documentready.js"
+        type="text/javascript"></script>
+<script src="lib/polyfills.js"
+type="text/javascript"></script>
         <script src="midi/timbre.js" type="text/javascript"></script>
 
 	<script src="write/raphael.js" type="text/javascript"></script>
@@ -16,7 +19,7 @@
         <script src="write/abc_write.js" type="text/javascript"></script>
 	<script src="api/abc_tunebook.js" type="text/javascript"></script>
         
-        <script src="data/abc_tune.js">type="text/javascript"></script>
+        <script src="data/abc_tune.js" type="text/javascript"></script>
         <script src="parse/abc_parse_header.js" type="text/javascript"></script>
 	<script src="parse/abc_tokenizer.js" type="text/javascript"></script>
 	<script src="parse/abc_parse_key_voice.js" type="text/javascript"></script>
@@ -80,6 +83,19 @@ g2g g2e|c2c c2B|A^GA ABc|d3-d2 z|]<br />
 
 </p>
 
+<div class="notes">
+X: 1<br>
+T: The Night Before Larry Was Stretched<br>
+R: slip jig<br>
+<div id="notes1">
+M: 9/8<br>
+L: 1/8<br>
+K: Emin<br>
+|:GFE EB,E E2 G|FED DA,D FGA|GFE EB,E E2 G|FGA ABG FED:|<br />
+|:G2 B BcA B3|G2B Bcd ecA|G2 B BcA Bcd|e2 A ABG FED:|
+</div><!-- /#notes1 -->
+</div><!-- /.notes -->
+
 In this document, small bits of abc are interpreted
 <br>
 X: 1<br>
@@ -106,6 +122,15 @@ M: 4/4
 L: 1/8
 K: Emin
 |:D2|EB
+
+X: 1
+T: 6' Cooley's
+M: 4/4
+L: 1/8
+K: Emin
+|:D2|EB
+
+a second one inside a pre
 </pre>
 <div class="content">X:1<br />T: 7 begin<br />G<br /><br />This is mid-line.<br />X:1<br />T:8 middle<br />G<br /><br />X:1<br />T:9 blank lines on either side<br />G<br /><br />in the middle it should work<br />X:1<br />T:10 end<br />G</div>
 <span class="postbody">X:1
