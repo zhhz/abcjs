@@ -87,7 +87,7 @@ if (!window.ABCJS)
   
   window.ABCJS.Plugin.prototype.start = function() {
     this.errors=[];
-    var elems = this.getABCContainingElements(document.getElementsByTagName("body")[0]);
+    var elems = this.getABCContainingElements(document.body);
     var divs = [];
     elems.forEach(function(elem){
       divs = divs.concat(this.convertToDivs(elem));
