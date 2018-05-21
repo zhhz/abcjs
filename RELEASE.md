@@ -1,3 +1,37 @@
+# Version 5.1.1
+
+## Bug fixes:
+
+Fix regression for having the SVG responsive.
+
+# Version 5.1.0
+
+## Bug fixes:
+
+* Fix bug with spacing triplets when the stem direction is not explicitly set.
+
+* Fix problem with sizing the music div when zooming.
+
+* Fix crash when clicking on the time signature.
+
+* Fix bug in beat detection in midi listener.
+
+## Features
+
+* Add entry point for parseOnly().
+
+* Expose midi.setRandomProgress().
+
+* Expose midi.setLoop().
+
+* Expose midi.restartPlay().
+
+# Version 5.0.1
+
+## Bug fixes:
+
+* Comply with the Chrome change to not play audio unless the AudioContext is resumed inside a user interaction.
+
 # Version 5.0.0
 
 ## Bug fixes:

@@ -5,7 +5,7 @@ var midiParser = require('./src/midi/abc_midi_create');
 
 var abcjs = {};
 
-abcjs.signature = "abcjs-basic v5.0.0";
+abcjs.signature = "abcjs-basic v5.1.1";
 
 Object.keys(animation).forEach(function (key) {
 	abcjs[key] = animation[key];
